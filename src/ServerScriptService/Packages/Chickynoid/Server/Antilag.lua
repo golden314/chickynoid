@@ -12,15 +12,15 @@ local animStates = {
 	{
 		"animCounter0",
 		"animNum0",
-	}
+	},
 	{
 		"animCounter1",
 		"animNum1",
-	}
+	},
 	{
 		"animCounter2",
 		"animNum2",
-	}
+	},
 	{
 		"animCounter2",
 		"animNum3",
@@ -33,8 +33,8 @@ function module:Setup(server)
    local Rig = path.Assets.R15Rig
    local Animator = Rig.Humanoid.Animator
 	
-   for _, name in pairs(Animations) do
-      if Animator[name] then
+   for _, name in pairs(Animations.animations) do
+      if Animator:FindFirstChild(name) then
          local animation = Animator[name]
          Keyframes:InsertAnimations(name, animation) --TODO: Parent the animation's keyframes to the animation (Temporary fix)
          --Keyframes:InsertAnimations(name, animation:FindFirstChildWhichIsA("KeyframeSequence")
