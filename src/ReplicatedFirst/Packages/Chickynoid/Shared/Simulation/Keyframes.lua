@@ -34,6 +34,17 @@ local function convert(sequence: KeyframeSequence)
 	return frames, max
 end
 
+local function percentDiff(a,b)
+	local absDiff = math.abs(a - b)
+	local avg = (a + b)/2
+
+	return (absDiff / avg) * 100
+end
+
+local function isClose(a, b)
+	return (100 - percentDiff(a, b))/100
+end
+
 local originalMotorOffsets = { --Only takes in roblox rig motors currently. (C1 Motors)
 	["HumanoidRootPart"] = CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0),
 	
@@ -107,7 +118,7 @@ function module:ApplyToRig(rig: Model)
 		local keyframe = record.animation[record.time]
 		
 
-    if keyframe then
+    		if keyframe then
 			for _, pose in pairs(keyframe) do
 				if not finalPose[pose.limb] then
 					finalPose[pose.limb] = originalMotorOffsets[pose.limb]
@@ -117,8 +128,9 @@ function module:ApplyToRig(rig: Model)
 				
 				finalPose[pose.limb] = finalPose[pose.limb]:Lerp(cf, record.weight)
 				
-				continue
 			end
+
+			continue
 		end
 		
 		--TODO: Interpolate between keyframes, this doesnt actually interpolate yet
@@ -147,9 +159,32 @@ function module:ApplyToRig(rig: Model)
 			local cf = originalMotorOffsets[pose.limb] * pose.cf:Inverse()
 
 			finalPose[pose.limb] = finalPose[pose.limb]:Lerp(cf, record.weight)
-
-			continue
 		end
+
+		--[[
+		--This interpolation is broken, and I have no idea how to fix it
+		
+		local lerpedCfs = {}
+		
+		for frame, keyframe in pairs(record.animation) do
+			for _, pose in pairs(keyframe) do
+				if not lerpedCfs[pose.limb] then
+					lerpedCfs[pose.limb] = originalMotorOffsets[pose.limb]
+				end
+
+				local cf = originalMotorOffsets[pose.limb] * pose.cf:Inverse()
+
+				lerpedCfs[pose.limb] = lerpedCfs[pose.limb]:Lerp(cf, isClose(frame, record.time))
+			end
+		end
+		
+		for limb, cf in pairs(lerpedCfs) do
+			if not finalPose[limb] then
+				finalPose[limb] = originalMotorOffsets[limb]
+			end
+			
+			finalPose[limb] = finalPose[limb]:Lerp(cf, record.weight)
+		end]]
 	end
 	
 	--Now apply to rig
