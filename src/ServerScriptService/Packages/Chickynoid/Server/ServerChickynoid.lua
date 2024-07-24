@@ -468,7 +468,20 @@ function ServerChickynoid:UpdateServerCollisionBox(server)
         box.CanTouch = true
         box.CanCollide = true
         box.CanQuery = true
-        box:SetAttribute("player", self.playerRecord.userId)
+	box:SetAttribute("player", self.playerRecord.userId)
+		
+	local rig = path.Assets.R15Rig:Clone()
+	rig.Name = "Rig"
+	rig.Humanoid:Destroy()
+	rig:PivotTo(box.CFrame)
+	rig.Parent = box
+		
+	for _, part in pairs(rig:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part:SetAttribute("player", self.playerRecord.userId)
+		end
+	end
+		
         self.hitBox = box
         self.hitBoxCreated:Fire(self.hitBox);
 
@@ -478,7 +491,9 @@ function ServerChickynoid:UpdateServerCollisionBox(server)
         end
     end
     self.hitBox.CFrame = CFrame.new(self.simulation.state.pos)
-    self.hitBox.Velocity = self.simulation.state.vel
+	self.hitBox.Velocity = self.simulation.state.vel
+	
+	self.hitBox.Rig:PivotTo(self.hitBox.CFrame)
 end
 
 function ServerChickynoid:RobloxPhysicsStep(server, _deltaTime)
