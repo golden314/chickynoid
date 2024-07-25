@@ -556,9 +556,9 @@ function Simulation:MovetypeWalking(cmd)
 
             --Good time to trigger our walk anim
             if self.state.pushing > 0 then
-                self.characterData:PlayAnimation("Push", Enums.AnimChannel.Channel0, false)
+                self.characterData:PlayAnimation("Push", Enums.AnimChannel.Channel0, false, nil, cmd.deltaTime)
             else
-				self.characterData:PlayAnimation("Walk", Enums.AnimChannel.Channel0, false)
+		self.characterData:PlayAnimation("Walk", Enums.AnimChannel.Channel0, false, nil, self.characterData.serialized.flatSpeed/16 + cmd.deltaTime)
             end
         else
             --Moving through the air under player control
@@ -570,7 +570,7 @@ function Simulation:MovetypeWalking(cmd)
             flatVel = MathUtils:VelocityFriction(flatVel, self.constants.brakeFriction, cmd.deltaTime)
 
             --Enter idle
-			self.characterData:PlayAnimation("Idle", Enums.AnimChannel.Channel0, false)
+		self.characterData:PlayAnimation("Idle", Enums.AnimChannel.Channel0, false, nil, cmd.deltaTime)
         -- else
             --moving through the air with no input
         end
@@ -593,7 +593,7 @@ function Simulation:MovetypeWalking(cmd)
             self.state.vel = Vector3.new(self.state.vel.x, self.constants.jumpPunch, self.state.vel.z)
             self.state.jump = 0.2 --jumping has a cooldown (think jumping up a staircase)
             self.state.jumpThrust = self.constants.jumpThrustPower
-			self.characterData:PlayAnimation("Jump", Enums.AnimChannel.Channel0, true, 0.2)
+			self.characterData:PlayAnimation("Jump", Enums.AnimChannel.Channel0, true, 0.2, cmd.deltaTime)
         end
 
     end
@@ -627,7 +627,7 @@ function Simulation:MovetypeWalking(cmd)
 
         --Switch to falling if we've been off the ground for a bit
         if self.state.vel.y <= 0.01 and self.state.inAir > 0.5 then
-			self.characterData:PlayAnimation("Fall", Enums.AnimChannel.Channel0, false)
+		self.characterData:PlayAnimation("Fall", Enums.AnimChannel.Channel0, false, nil, cmd.deltaTime)
         end
     else
         self.state.inAir = 0
