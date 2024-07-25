@@ -161,16 +161,26 @@ function module:PushPlayerPositionsToTime(playerRecord, serverTime, debugText)
                 local name = Animations:GetAnimation(num)
 
 		if name then
-                	--Keyframes:SetTime(name, counter/255) --Can someone fact check this?
-                	--Is the counter supposed to be time progressing??
-                	--This might cause animations to go slower than usual, refactor this.
-
-			--The best I can do for now, this might cause a desync tho
-			Keyframes:SetTime(name, serverTime%Keyframes.Animations[name].max)
+			local channel = tonumber(string.sub(state[2], 8, 9))
+					
+			local totalTime = lerp(prevPlayerRecord.animTime[channel], nextPlayerRecord.animTime[channel], frac)
+			local max = Keyframes.Animations[name].max
+					
+			Keyframes:SetTime(name, totalTime%max)
+			Keyframes:SetWeight(name, 1)
 		end
             end
 
             Keyframes:ApplyToRig(otherPlayerRecord.chickynoid.hitBox.Rig)
+
+		Keyframes:ApplyToRig(otherPlayerRecord.chickynoid.hitBox.Rig)
+			
+		for _, name in pairs(Animations.animations) do
+			if name == "Stop" then
+				continue
+			end
+			Keyframes:SetWeight(name, 0.01)
+		end
 			
             if debugFlag == true then
                 local event = {}
