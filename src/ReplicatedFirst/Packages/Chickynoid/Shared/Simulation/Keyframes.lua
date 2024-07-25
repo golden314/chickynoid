@@ -19,6 +19,10 @@ local function convert(sequence: KeyframeSequence)
 		local currentKeyframe = {}
 		
 		for _, pose: Pose in pairs(keyframe:GetDescendants()) do
+			if not pose:IsA("Pose") then
+				continue
+			end
+			
 			table.insert(currentKeyframe, {
 				limb = pose.Name,
 				cf = pose.CFrame,
@@ -48,14 +52,16 @@ end
 local originalMotorOffsets = { --Only takes in roblox rig motors currently. (C1 Motors)
 	["HumanoidRootPart"] = CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0),
 	
+	["Head"] = CFrame.new(0, -0.491300106, -0.000263773836, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	--["Head"] = CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), --Comment this in, if you are using a R6 rig
+	
 	--R6
-	["Head"] = CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0),
 	["Left Arm"] = CFrame.new(0.5, 0.5, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0),
 	["Left Leg"] = CFrame.new(-0.5, 1, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0),
 	["Right Arm"] = CFrame.new(-0.5, 0.5, 0, 0, 0, 1, 0, 1, 0, -1, 0, 0),
 	["Right Leg"] = CFrame.new(0.5, 1, 0, 0, 0, 1, 0, 1, 0, -1, 0, 0),
 	["Torso"] = CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0),
-	
+
 	--R15
 	["RightFoot"] = CFrame.new(0, 0.106015317, 7.65293444e-05, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 	["RightHand"] = CFrame.new(3.52001166e-07, 0.131572768, 6.12894695e-08, 1, 0, 0, 0, 1, 0, 0, 0, 1),
@@ -63,6 +69,13 @@ local originalMotorOffsets = { --Only takes in roblox rig motors currently. (C1 
 	["RightLowerLeg"] = CFrame.new(0, 0.413358927, 2.48585493e-05, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 	["RightUpperArm"] = CFrame.new(-0.500534058, 0.418923318, 8.95738594e-08, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 	["RightUpperLeg"] = CFrame.new(0, 0.471393555, -6.49150097e-05, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftFoot"] = CFrame.new(-1.80400747e-07, 0.106015436, -1.72411478e-06, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftHand"] = CFrame.new(0.000471446925, 0.131572768, 6.12894695e-08, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftLowerArm"] = CFrame.new(0.000479135837, 0.274824202, 7.65889566e-20, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftLowerLeg"] = CFrame.new(2.95890423e-08, 0.413189024, -1.56485186e-07, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftUpperArm"] = CFrame.new(0.5005337, 0.418923318, 8.95738594e-08, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LeftUpperLeg"] = CFrame.new(5.91780847e-08, 0.471393436, -1.59454345e-07, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+	["LowerTorso"] = CFrame.new(-1.1920929e-07, -0.199972257, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 	["UpperTorso"] = CFrame.new(-5.79121036e-08, -0.849000454, 1.19686121e-07, 1, 0, 0, 0, 1, 0, 0, 0, 1),
 }
 
