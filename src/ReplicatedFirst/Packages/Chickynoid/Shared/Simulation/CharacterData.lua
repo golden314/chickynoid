@@ -303,6 +303,13 @@ function CharacterData.new()
 			animNum3 = 0,
         },
 
+	animTime = {
+			[0] = 0,
+			[1] = 0,
+			[2] = 0,
+			[3] = 0,
+		},
+
         --Be extremely careful about having any kind of persistant nonserialized data!
         --If in doubt, stick it in the serialized!
         isResimulating = false,
@@ -355,7 +362,7 @@ function CharacterData:SetStepUp(amount)
     self.serialized.stepUp = amount
 end
 
-function CharacterData:PlayAnimation(animName : string, animChannel, forceRestart, exclusiveTime)
+function CharacterData:PlayAnimation(animName : string, animChannel, forceRestart, exclusiveTime, dt)
 	
 	local animIndex =Animations:GetAnimationIndex(animName)
 	if (animIndex == nil) then
@@ -364,7 +371,7 @@ function CharacterData:PlayAnimation(animName : string, animChannel, forceRestar
 	self:PlayAnimationIndex(animIndex, animChannel, forceRestart, exclusiveTime)
 end
 
-function CharacterData:PlayAnimationIndex(animNum, animChannel, forceRestart, exclusiveTime)
+function CharacterData:PlayAnimationIndex(animNum, animChannel, forceRestart, exclusiveTime, dt)
 	--Dont change animations during resim
 	if self.isResimulating == true then
 		return
@@ -393,6 +400,10 @@ function CharacterData:PlayAnimationIndex(animNum, animChannel, forceRestart, ex
 		end
 	end
 	self.serialized[slotString] = animNum
+
+	if dt then
+		self.animTime[animChannel] += dt
+	end
 end
 
 
