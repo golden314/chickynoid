@@ -493,7 +493,10 @@ function ServerChickynoid:UpdateServerCollisionBox(server)
     self.hitBox.CFrame = CFrame.new(self.simulation.state.pos)
 	self.hitBox.Velocity = self.simulation.state.vel
 	
-	self.hitBox.Rig:PivotTo(self.hitBox.CFrame)
+	self.hitBox.Rig:PivotTo(
+		CFrame.new(self.hitBox.Position + Vector3.new(0, 0.5, 0))
+		* CFrame.fromEulerAnglesXYZ(0, self.simulation.state.angle, 0)
+	)
 end
 
 function ServerChickynoid:RobloxPhysicsStep(server, _deltaTime)
