@@ -1,4 +1,8 @@
 --!native
+local function lerp(a, b, t)
+	return a + (b - a) * t
+end
+
 local module = {}
 module.history = {}
 module.temporaryPositions = {}
@@ -54,15 +58,16 @@ function module:WritePlayerPositions(serverTime)
             
             local record = {}
             record.position = characterData:GetPosition() --get current visual position
+            record.angle = characterData.serialized.angle
             record.animations = {
-                animCounter0 = characterData.animCounter0,
-		animNum0 = characterData.animNum0,
-		animCounter1 = characterData.animCounter1,
-		animNum1 = characterData.animNum1,
-		animCounter2 = characterData.animCounter2,
-		animNum2 = characterData.animNum2,
-		animCounter3 = characterData.animCounter3,
-		animNum3 = characterData.animNum3,
+                animCounter0 = characterData.serialized.animCounter0,
+		animNum0 = characterData.serialized.animNum0,
+		animCounter1 = characterData.serialized.animCounter1,
+		animNum1 = characterData.serialized.animNum1,
+		animCounter2 = characterData.serialized.animCounter2,
+		animNum2 = characterData.serialized.animNum2,
+		animCounter3 = characterData.serialized.animCounter3,
+		animNum3 = characterData.serialized.animNum3,
             }
             snapshot.players[playerRecord.userId] = record
         end
@@ -142,22 +147,27 @@ function module:PushPlayerPositionsToTime(playerRecord, serverTime, debugText)
             self.temporaryPositions[userId] = oldPos --Store it
 
             local pos = prevPlayerRecord.position:Lerp(nextPlayerRecord.position, frac)
+            local angle = lerp(prevPlayerRecord.angle, nextPlayerRecord.angle, frac)
             
 
             --place it just how it was when the server saw it
             otherPlayerRecord.chickynoid.hitBox.Position = pos
-            otherPlayerRecord.chickynoid.hitBox.Rig:PivotTo(CFrame.new(pos))
+            otherPlayerRecord.chickynoid.hitBox.Rig:PivotTo(CFrame.new(pos) * CFrame.fromEulerAnglesXYZ(0, angle, 0))
 
-            for _, v in pairs(animStates) do
-                for _, state in pairs(v) do
-                    local counter = prevPlayerRecord.animations[state[1]]
-		    local num = prevPlayerRecord.animations[state[2]]
+            for _, state in pairs(animStates) do
+                local counter = prevPlayerRecord.animations[state[1]]
+		local num = prevPlayerRecord.animations[state[2]]
 
-                    local name = Animations:GetAnimation(num)
-                    Keyframes:SetTime(name, counter/255) --Can someone fact check this?
-                    --Is the counter supposed to be time progressing??
-                    --This might cause animations to go slower than usual, refactor this.
-                end
+                local name = Animations:GetAnimation(num)
+
+		if name then
+                	--Keyframes:SetTime(name, counter/255) --Can someone fact check this?
+                	--Is the counter supposed to be time progressing??
+                	--This might cause animations to go slower than usual, refactor this.
+
+			--The best I can do for now, this might cause a desync tho
+			Keyframes:SetTime(name, serverTime%Keyframes.Animations[name].max)
+		end
             end
 
             Keyframes:ApplyToRig(otherPlayerRecord.chickynoid.hitBox.Rig)
