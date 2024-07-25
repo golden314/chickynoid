@@ -465,9 +465,9 @@ function ServerChickynoid:UpdateServerCollisionBox(server)
         box.Parent = server.worldRoot
         box.Position = self.simulation.state.pos
         box.Anchored = true
-        box.CanTouch = true
-        box.CanCollide = true
-        box.CanQuery = true
+	box.CanCollide = false
+	box.CanQuery = false
+        box.CanTouch = false
 	box:SetAttribute("player", self.playerRecord.userId)
 		
 	local rig = path.Assets.R15Rig:Clone()
