@@ -53,7 +53,7 @@ local originalMotorOffsets = { --Only takes in roblox rig motors currently. (C1 
 	["HumanoidRootPart"] = CFrame.new(0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 1, -0),
 	
 	["Head"] = CFrame.new(0, -0.491300106, -0.000263773836, 1, 0, 0, 0, 1, 0, 0, 0, 1),
-	--["Head"] = CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), --Comment this in, if you are using a R6 rig
+	--["Head"] = CFrame.new(0, -0.5, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0), --Put this back in, if you are using a R6 rig
 	
 	--R6
 	["Left Arm"] = CFrame.new(0.5, 0.5, 0, 0, 0, -1, 0, 1, 0, 1, 0, 0),
@@ -140,7 +140,6 @@ function module:ApplyToRig(rig: Model)
 				local cf = originalMotorOffsets[pose.limb] * pose.cf:Inverse()
 				
 				finalPose[pose.limb] = finalPose[pose.limb]:Lerp(cf, record.weight)
-				
 			end
 
 			continue
@@ -163,6 +162,22 @@ function module:ApplyToRig(rig: Model)
 		
 		local minKeyframe = record.animation[minIndex]
 		local maxKeyframe = record.animation[maxIndex]
+
+		local half = minIndex + (maxIndex - minIndex)/2
+		
+		if record.time < half then
+			for _, pose in pairs(minKeyframe) do
+				if not finalPose[pose.limb] then
+					finalPose[pose.limb] = originalMotorOffsets[pose.limb]
+				end
+
+				local cf = originalMotorOffsets[pose.limb] * pose.cf:Inverse()
+
+				finalPose[pose.limb] = finalPose[pose.limb]:Lerp(cf, record.weight)
+			end
+			
+			continue
+		end
 		
 		for _, pose in pairs(maxKeyframe) do
 			if not finalPose[pose.limb] then
@@ -173,31 +188,6 @@ function module:ApplyToRig(rig: Model)
 
 			finalPose[pose.limb] = finalPose[pose.limb]:Lerp(cf, record.weight)
 		end
-
-		--[[
-		--This interpolation is broken, and I have no idea how to fix it
-		
-		local lerpedCfs = {}
-		
-		for frame, keyframe in pairs(record.animation) do
-			for _, pose in pairs(keyframe) do
-				if not lerpedCfs[pose.limb] then
-					lerpedCfs[pose.limb] = originalMotorOffsets[pose.limb]
-				end
-
-				local cf = originalMotorOffsets[pose.limb] * pose.cf:Inverse()
-
-				lerpedCfs[pose.limb] = lerpedCfs[pose.limb]:Lerp(cf, isClose(frame, record.time))
-			end
-		end
-		
-		for limb, cf in pairs(lerpedCfs) do
-			if not finalPose[limb] then
-				finalPose[limb] = originalMotorOffsets[limb]
-			end
-			
-			finalPose[limb] = finalPose[limb]:Lerp(cf, record.weight)
-		end]]
 	end
 	
 	--Now apply to rig
