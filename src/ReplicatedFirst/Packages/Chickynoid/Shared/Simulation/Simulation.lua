@@ -558,7 +558,7 @@ function Simulation:MovetypeWalking(cmd)
             if self.state.pushing > 0 then
                 self.characterData:PlayAnimation("Push", Enums.AnimChannel.Channel0, false, nil, cmd.deltaTime)
             else
-		self.characterData:PlayAnimation("Walk", Enums.AnimChannel.Channel0, false, nil, self.characterData.serialized.flatSpeed/16 + cmd.deltaTime)
+		self.characterData:PlayAnimation("Walk", Enums.AnimChannel.Channel0, false, nil, self.characterData.serialized.flatSpeed/16 * cmd.deltaTime)
             end
         else
             --Moving through the air under player control
